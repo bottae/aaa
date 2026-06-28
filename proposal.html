@@ -1,0 +1,549 @@
+<title>강욱순스포츠 디지털 리뉴얼 제안서</title>
+<meta name="description" content="KWS Sports 골프 연습장 웹사이트 럭셔리 개편 — 현황 진단부터 IA, 기술 아키텍처, 실행 로드맵까지.">
+
+<style>
+  :root {
+    --ink: #15231C;
+    --fairway: #103528;
+    --fairway-2: #0B2620;
+    --moss: #3A6B54;
+    --brass: #A8823C;
+    --brass-soft: #C9A85F;
+    --paper: #F2F4EF;
+    --card: #FBFCFA;
+    --light: #EDF1EA;
+    --line: rgba(21, 35, 28, 0.13);
+    --line-soft: rgba(21, 35, 28, 0.07);
+    --line-dark: rgba(237, 241, 234, 0.16);
+    --shadow: 0 1px 2px rgba(16,53,40,.04), 0 12px 34px -18px rgba(16,53,40,.22);
+
+    --sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
+            "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Georgia, serif;
+
+    --step--1: clamp(.78rem, .76rem + .1vw, .84rem);
+    --step-0: clamp(1rem, .97rem + .14vw, 1.08rem);
+    --step-1: clamp(1.2rem, 1.12rem + .4vw, 1.45rem);
+    --step-2: clamp(1.55rem, 1.36rem + .9vw, 2.1rem);
+    --step-3: clamp(2.1rem, 1.7rem + 1.9vw, 3.1rem);
+    --step-4: clamp(2.9rem, 2.1rem + 3.8vw, 5rem);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: var(--step-0);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.003em;
+  }
+
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 28px; }
+  .narrow { max-width: 760px; }
+
+  h1, h2, h3 { text-wrap: balance; line-height: 1.18; margin: 0; font-weight: 700; }
+
+  .eyebrow {
+    font-size: var(--step--1);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--brass);
+  }
+
+  .num {
+    font-family: var(--serif);
+    font-variant-numeric: tabular-nums;
+    font-style: italic;
+  }
+
+  a { color: inherit; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    background:
+      radial-gradient(120% 140% at 82% -10%, rgba(168,130,60,.18), transparent 46%),
+      linear-gradient(168deg, var(--fairway) 0%, var(--fairway-2) 100%);
+    color: var(--light);
+    padding: clamp(46px, 8vw, 92px) 0 clamp(48px, 7vw, 80px);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line-dark) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(80% 70% at 70% 20%, #000 0%, transparent 75%);
+            mask-image: radial-gradient(80% 70% at 70% 20%, #000 0%, transparent 75%);
+    opacity: .5;
+    pointer-events: none;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+
+  .hero-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 16px; flex-wrap: wrap;
+    padding-bottom: clamp(40px, 7vw, 80px);
+  }
+  .brandmark { font-family: var(--serif); font-size: var(--step-1); letter-spacing: .04em; }
+  .brandmark b { color: var(--brass-soft); font-weight: 700; }
+  .hero-doc { font-size: var(--step--1); letter-spacing: .18em; text-transform: uppercase; color: rgba(237,241,234,.6); }
+
+  .hero h1 {
+    font-size: var(--step-4);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    max-width: 16ch;
+  }
+  .hero h1 em { font-family: var(--serif); font-style: italic; font-weight: 500; color: var(--brass-soft); }
+  .hero-lead {
+    margin-top: 28px;
+    max-width: 46ch;
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: rgba(237,241,234,.82);
+    font-weight: 400;
+  }
+  .hero-meta {
+    margin-top: clamp(40px, 6vw, 64px);
+    display: flex; flex-wrap: wrap; gap: 0;
+    border-top: 1px solid var(--line-dark);
+  }
+  .hero-meta div {
+    flex: 1 1 140px;
+    padding: 18px 22px 18px 0;
+    border-right: 1px solid var(--line-dark);
+  }
+  .hero-meta div:last-child { border-right: 0; }
+  .hero-meta dt { font-size: var(--step--1); letter-spacing: .14em; text-transform: uppercase; color: rgba(237,241,234,.5); margin-bottom: 6px; }
+  .hero-meta dd { margin: 0; font-size: var(--step-0); color: var(--light); font-weight: 500; }
+
+  /* ---------- SECTION SHELL ---------- */
+  section { padding: clamp(56px, 9vw, 104px) 0; }
+  .sec-head { display: flex; gap: 20px; align-items: baseline; margin-bottom: clamp(28px, 4vw, 48px); }
+  .sec-head .idx { font-family: var(--serif); font-style: italic; font-size: var(--step-2); color: var(--brass); line-height: 1; flex: none; }
+  .sec-head .titles { flex: 1; }
+  .sec-head h2 { font-size: var(--step-3); letter-spacing: -0.015em; }
+  .sec-head .kicker { font-size: var(--step--1); letter-spacing: .2em; text-transform: uppercase; color: var(--moss); font-weight: 600; margin-bottom: 10px; }
+  .lead-p { font-size: var(--step-1); line-height: 1.6; color: #33463D; max-width: 60ch; font-weight: 400; }
+
+  .alt { background: #EAEEE6; }
+  .dark { background: linear-gradient(168deg, var(--fairway), var(--fairway-2)); color: var(--light); }
+  .dark .sec-head h2 { color: var(--light); }
+  .dark .sec-head .idx, .dark .eyebrow { color: var(--brass-soft); }
+  .dark .lead-p { color: rgba(237,241,234,.78); }
+
+  /* ---------- EXEC SUMMARY ---------- */
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+  .summary-grid li { list-style: none; background: var(--card); padding: 26px 24px; }
+  .summary-grid .big { font-family: var(--serif); font-size: var(--step-2); color: var(--fairway); display: block; margin-bottom: 6px; font-weight: 600; }
+  .summary-grid .lbl { font-weight: 600; display: block; margin-bottom: 4px; }
+  .summary-grid p { margin: 0; font-size: var(--step--1); color: #4A5A52; line-height: 1.55; }
+
+  /* ---------- DIAGNOSIS TABLE ---------- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; background: var(--card); }
+  table.diag { width: 100%; border-collapse: collapse; min-width: 640px; }
+  table.diag th, table.diag td { text-align: left; padding: 16px 20px; vertical-align: top; border-bottom: 1px solid var(--line-soft); font-size: var(--step--1); line-height: 1.5; }
+  table.diag thead th { font-size: var(--step--1); letter-spacing: .12em; text-transform: uppercase; color: var(--moss); font-weight: 600; background: #EEF2EA; border-bottom: 1px solid var(--line); }
+  table.diag tbody tr:last-child td { border-bottom: 0; }
+  table.diag .cat { font-weight: 700; color: var(--ink); white-space: nowrap; }
+  table.diag .now { color: #6A6258; }
+  table.diag .fix { color: var(--fairway); font-weight: 500; }
+  .sev { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+  .sev.hi { background: #B4502E; } .sev.md { background: var(--brass); } .sev.lo { background: var(--moss); }
+
+  /* ---------- TREND CARDS ---------- */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: 26px 24px; box-shadow: var(--shadow); }
+  .dark .card { background: rgba(237,241,234,.05); border-color: var(--line-dark); box-shadow: none; }
+  .card h3 { font-size: var(--step-1); margin-bottom: 10px; letter-spacing: -.01em; }
+  .dark .card h3 { color: var(--light); }
+  .card p { margin: 0; font-size: var(--step--1); color: #4A5A52; line-height: 1.6; }
+  .dark .card p { color: rgba(237,241,234,.72); }
+  .card .tag { font-family: var(--serif); font-style: italic; color: var(--brass); font-size: var(--step-1); display: block; margin-bottom: 14px; }
+  .dark .card .tag { color: var(--brass-soft); }
+
+  /* ---------- DESIGN DIRECTION / SWATCHES ---------- */
+  .dd-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: start; }
+  .swatches { display: flex; border-radius: 5px; overflow: hidden; border: 1px solid var(--line-dark); height: 96px; }
+  .swatches span { flex: 1; display: flex; align-items: flex-end; padding: 10px; font-size: 11px; letter-spacing: .04em; }
+  .principle-list { list-style: none; padding: 0; margin: 0; }
+  .principle-list li { padding: 18px 0; border-bottom: 1px solid var(--line-dark); display: flex; gap: 16px; }
+  .principle-list li:last-child { border-bottom: 0; }
+  .principle-list .pn { font-family: var(--serif); font-style: italic; color: var(--brass-soft); flex: none; }
+  .principle-list b { color: var(--light); display: block; }
+  .principle-list span.d { color: rgba(237,241,234,.7); font-size: var(--step--1); }
+  .type-spec { font-family: var(--serif); }
+  .type-spec .lg { font-size: clamp(2.4rem, 6vw, 3.6rem); line-height: 1.1; color: var(--light); font-weight: 600; }
+  .type-spec .sm { font-size: var(--step--1); color: rgba(237,241,234,.6); letter-spacing: .1em; text-transform: uppercase; margin-top: 10px; font-family: var(--sans); }
+
+  /* ---------- IA / SITEMAP ---------- */
+  .ia { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .ia-col { border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+  .ia-col h3 { font-size: var(--step-0); padding: 16px 22px; background: #EEF2EA; border-bottom: 1px solid var(--line); letter-spacing: .04em; }
+  .ia-col.old h3 { color: #8A8478; }
+  .ia-col.new h3 { color: var(--fairway); }
+  .ia-col ul { list-style: none; margin: 0; padding: 8px 0; }
+  .ia-col li { padding: 9px 22px; font-size: var(--step--1); border-bottom: 1px solid var(--line-soft); }
+  .ia-col li:last-child { border-bottom: 0; }
+  .ia-col.old li { color: #8A8478; }
+  .ia-col .grp { font-weight: 700; color: var(--ink); }
+  .ia-col.new .grp::before { content: "›"; color: var(--brass); margin-right: 8px; font-weight: 700; }
+  .ia-col .sub { color: #6A7269; padding-left: 22px; font-size: calc(var(--step--1) - .02rem); }
+
+  /* ---------- ARCHITECTURE ---------- */
+  .arch { display: flex; flex-direction: column; gap: 12px; }
+  .layer { border: 1px solid var(--line-dark); border-radius: 5px; padding: 20px 24px; background: rgba(237,241,234,.04); display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center; }
+  .layer .lname { font-weight: 700; color: var(--light); }
+  .layer .lname small { display: block; font-weight: 400; color: rgba(237,241,234,.55); font-size: var(--step--1); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: var(--step--1); padding: 6px 13px; border: 1px solid var(--line-dark); border-radius: 999px; color: rgba(237,241,234,.85); background: rgba(168,130,60,.07); }
+  .chip b { color: var(--brass-soft); font-weight: 600; }
+
+  /* ---------- ROADMAP ---------- */
+  .timeline { display: flex; flex-direction: column; gap: 0; border-left: 2px solid var(--line); margin-left: 8px; }
+  .phase { position: relative; padding: 0 0 34px 34px; }
+  .phase:last-child { padding-bottom: 0; }
+  .phase::before { content: ""; position: absolute; left: -9px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); border: 3px solid var(--brass); }
+  .phase.ph0::before { border-color: var(--moss); }
+  .phase .pmeta { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px; }
+  .phase .pn2 { font-family: var(--serif); font-style: italic; color: var(--brass); font-size: var(--step-1); }
+  .phase h3 { font-size: var(--step-1); letter-spacing: -.01em; }
+  .phase .dur { font-size: var(--step--1); color: #fff; background: var(--moss); padding: 3px 11px; border-radius: 999px; letter-spacing: .03em; }
+  .phase p { margin: 4px 0 0; color: #4A5A52; font-size: var(--step--1); max-width: 64ch; }
+  .phase .deliver { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 7px; }
+  .phase .deliver span { font-size: calc(var(--step--1) - .02rem); color: var(--fairway); border: 1px solid var(--line); border-radius: 4px; padding: 3px 9px; background: var(--card); }
+
+  /* ---------- NEXT STEPS ---------- */
+  .next-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+  .qcard { border: 1px solid var(--line-dark); border-radius: 5px; padding: 24px; background: rgba(237,241,234,.04); }
+  .qcard .q { font-family: var(--serif); font-style: italic; font-size: var(--step-1); color: var(--brass-soft); margin-bottom: 10px; }
+  .qcard p { margin: 0; color: rgba(237,241,234,.78); font-size: var(--step--1); }
+
+  footer { background: var(--fairway-2); color: rgba(237,241,234,.6); padding: 40px 0; font-size: var(--step--1); }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  footer b { color: var(--brass-soft); font-weight: 600; }
+
+  /* reveal */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  @media (max-width: 760px) {
+    .dd-grid, .ia { grid-template-columns: 1fr; }
+    .layer { grid-template-columns: 1fr; gap: 12px; }
+    .sec-head { flex-direction: column; gap: 8px; }
+  }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <span class="brandmark">KWS&nbsp;<b>SPORTS</b> · 강욱순스포츠</span>
+      <span class="hero-doc">Website Renewal Proposal · 검토용 초안</span>
+    </div>
+    <p class="eyebrow">디지털 리뉴얼 제안서</p>
+    <h1>가기 전부터 <em>럭셔리</em>를 경험하는 골프 플랫폼</h1>
+    <p class="hero-lead">
+      강욱순스포츠는 파3 코스·드라이빙 레인지·아카데미·수영장·피트니스를 갖춘
+      원스톱 시설입니다. 지금의 웹사이트가 담지 못하는 그 격(格)을,
+      예약부터 멤버십까지 모바일에서 완성되는 경험으로 다시 설계합니다.
+    </p>
+    <dl class="hero-meta">
+      <div><dt>대상</dt><dd>강욱순스포츠(주)</dd></div>
+      <div><dt>범위</dt><dd>웹사이트 전면 개편</dd></div>
+      <div><dt>작성일</dt><dd>2026.06.28</dd></div>
+      <div><dt>상태</dt><dd>선배 검토 전 초안</dd></div>
+    </dl>
+  </div>
+</header>
+
+<!-- EXEC SUMMARY -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">00</span>
+      <div class="titles">
+        <p class="kicker">한눈에 보기</p>
+        <h2>제안의 핵심</h2>
+      </div>
+    </div>
+    <ul class="summary-grid reveal">
+      <li><span class="big">럭셔리</span><span class="lbl">브랜드 격에 맞는 비주얼</span><p>프로골퍼 강욱순의 이름값에 어울리는, 깊은 페어웨이 그린과 브라스 골드의 절제된 프리미엄 톤.</p></li>
+      <li><span class="big">예약 60초</span><span class="lbl">모바일 우선 예약 경험</span><p>파3·타석을 실시간 잔여 현황으로 보여주고, 휴대폰에서 60초 안에 예약·결제까지 끝나도록.</p></li>
+      <li><span class="big">멤버십</span><span class="lbl">회원 전용 콘텐츠 허브</span><p>GOLF BIBLE 스윙 강의를 보호된 회원 라운지로. 가입의 이유를 만드는 디지털 특전.</p></li>
+      <li><span class="big">확장형</span><span class="lbl">운영이 쉬운 구조</span><p>공지·이벤트·콘텐츠를 직원이 직접 올리는 CMS 기반. 한 번 만들고 오래 쓰는 아키텍처.</p></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 01 DIAGNOSIS -->
+<section class="alt">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">01</span>
+      <div class="titles">
+        <p class="kicker">현황 진단</p>
+        <h2>지금 사이트의 한계</h2>
+      </div>
+    </div>
+    <p class="lead-p reveal" style="margin-bottom:34px">
+      현재 kwssports.net은 6개 대분류의 정보는 갖췄지만, 구형 레이아웃과
+      복잡한 메뉴, 모바일 최적화 부재로 시설의 프리미엄 가치를 전달하지 못하고 있습니다.
+    </p>
+    <div class="table-scroll reveal">
+      <table class="diag">
+        <thead>
+          <tr><th>항목</th><th>현재 상태</th><th>개편 방향</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="cat"><span class="sev hi"></span>비주얼·브랜드</td><td class="now">텍스트 위주의 구형 디자인, 시설의 고급감 전달 부족</td><td class="fix">시설 실사진·영상 풀블리드, 일관된 디자인 시스템으로 격 표현</td></tr>
+          <tr><td class="cat"><span class="sev hi"></span>모바일</td><td class="now">반응형 미흡, 작은 화면에서 가독성·조작성 저하</td><td class="fix">모바일 퍼스트 설계, 엄지로 닿는 예약·전화 동선</td></tr>
+          <tr><td class="cat"><span class="sev hi"></span>예약</td><td class="now">파3 예약이 분리·단절, 타석 예약 흐름 불명확</td><td class="fix">실시간 잔여 현황 + 통합 예약·결제, 60초 완결</td></tr>
+          <tr><td class="cat"><span class="sev md"></span>정보구조(IA)</td><td class="now">6개 대분류에 항목 과다, 원하는 정보 도달 단계 많음</td><td class="fix">목적 기반 4~5개 메뉴로 단순화, 주요 동선 상단 고정</td></tr>
+          <tr><td class="cat"><span class="sev md"></span>멤버십 가치</td><td class="now">GOLF BIBLE 등 특전이 노출·보호 모두 약함</td><td class="fix">회원 전용 라운지로 분리, 가입 전환 동기 강화</td></tr>
+          <tr><td class="cat"><span class="sev lo"></span>성능·SEO</td><td class="now">로딩·검색 노출 최적화 여지</td><td class="fix">이미지 최적화·서버 렌더링으로 속도·검색 동시 개선</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:var(--step--1);color:#6A7269;margin-top:14px" class="reveal">
+      <span class="sev hi"></span>높음 · <span class="sev md"></span>중간 · <span class="sev lo"></span>낮음 — 개편 우선순위
+    </p>
+  </div>
+</section>
+
+<!-- 02 TRENDS -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">02</span>
+      <div class="titles">
+        <p class="kicker">벤치마킹 · 2026 트렌드</p>
+        <h2>지금 럭셔리 골프 웹은 이렇게 한다</h2>
+      </div>
+    </div>
+    <div class="cards reveal">
+      <div class="card"><span class="tag">01</span><h3>미니멀 시크</h3><p>넓은 여백, 정제된 산세리프, 차분한 자연 팔레트. 비우는 것으로 고급을 말합니다.</p></div>
+      <div class="card"><span class="tag">02</span><h3>몰입형 비주얼</h3><p>풀스크린 시설 영상과 패럴랙스. 사이트에 들어선 순간 코스에 선 듯한 첫인상.</p></div>
+      <div class="card"><span class="tag">03</span><h3>라이프스타일 통합</h3><p>골프를 넘어 수영·피트니스·아카데미를 하나의 '목적지 경험'으로 엮는 서사.</p></div>
+      <div class="card"><span class="tag">04</span><h3>네이티브 예약 엔진</h3><p>외부로 튕기지 않고 사이트 안에서 날짜→시간→타석→결제까지. 모바일 60초 완결.</p></div>
+    </div>
+    <p style="font-size:var(--step--1);color:#6A7269;margin-top:24px" class="reveal narrow">
+      참고: <a href="https://mycodelesswebsite.com/golf-course-websites/">Best Golf Course Websites 2026</a> ·
+      <a href="https://www.subframe.com/tips/golf-club-website-design-examples">Subframe 골프 클럽 사례</a> ·
+      <a href="https://www.reservewithrex.com/blog/driving-range-booking-software">드라이빙 레인지 예약 SW 가이드</a>
+    </p>
+  </div>
+</section>
+
+<!-- 03 DESIGN DIRECTION -->
+<section class="dark">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">03</span>
+      <div class="titles">
+        <p class="kicker">디자인 방향</p>
+        <h2>이 문서가 곧 무드보드입니다</h2>
+      </div>
+    </div>
+    <div class="dd-grid">
+      <div class="reveal">
+        <div class="type-spec" style="margin-bottom:34px">
+          <div class="lg">강욱순스포츠</div>
+          <div class="lg" style="color:var(--brass-soft)">Fairway &amp; Brass</div>
+          <div class="sm">디스플레이 세리프 + 한글 시스템 산세리프</div>
+        </div>
+        <div class="swatches" style="margin-bottom:14px">
+          <span style="background:#103528;color:#EDF1EA">Fairway</span>
+          <span style="background:#3A6B54;color:#EDF1EA">Moss</span>
+          <span style="background:#A8823C;color:#1b1206">Brass</span>
+          <span style="background:#F2F4EF;color:#15231C">Paper</span>
+          <span style="background:#15231C;color:#EDF1EA">Ink</span>
+        </div>
+        <p class="lead-p">깊은 페어웨이 그린을 바탕으로, 야디지 마커를 닮은 브라스 골드를 액센트로.
+          유행하는 크림·테라코타 대신 골프장 본연의 색에서 럭셔리를 끌어냅니다.</p>
+      </div>
+      <ul class="principle-list reveal">
+        <li><span class="pn">i.</span><span><b>여백이 격을 만든다</b><span class="d">콘텐츠를 줄이지 않되, 한 번에 하나씩 보여줍니다.</span></span></li>
+        <li><span class="pn">ii.</span><span><b>사진이 주인공</b><span class="d">시설 실사·영상이 화면을 채우고, 글자는 그 위에 절제되어 얹힙니다.</span></span></li>
+        <li><span class="pn">iii.</span><span><b>예약 버튼은 항상 손 닿는 곳</b><span class="d">어느 페이지에서도 한 번의 탭으로 예약 진입.</span></span></li>
+        <li><span class="pn">iv.</span><span><b>일관된 디자인 시스템</b><span class="d">버튼·카드·타이포를 토큰화해 모든 페이지가 한 브랜드로.</span></span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 04 IA -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">04</span>
+      <div class="titles">
+        <p class="kicker">정보구조 개편</p>
+        <h2>6개 메뉴를 목적 중심으로</h2>
+      </div>
+    </div>
+    <p class="lead-p reveal" style="margin-bottom:34px">방문자의 90%는 '예약'과 '시설·이용안내'를 찾아옵니다. 그 동선을 가장 짧게 만들고, 나머지는 깔끔히 정리합니다.</p>
+    <div class="ia reveal">
+      <div class="ia-col old">
+        <h3>현재 — 6개 대분류 · 항목 과다</h3>
+        <ul>
+          <li>소개 · 인사말 · 준비과정 · 미디어 · 배치도 · 오시는길 · 파트너</li>
+          <li>골프시설 (파3 · 레인지 · 어프로치 · 분석센터)</li>
+          <li>그외 시설 (수영장 · 피트니스 · 공공체육)</li>
+          <li>커뮤니티 (공지 · 이벤트 · FAQ · 고객센터)</li>
+          <li>골프아카데미 (일반 · 선수 · CEO · 뉴리더스)</li>
+          <li>이용안내 (시설별 가이드)</li>
+        </ul>
+      </div>
+      <div class="ia-col new">
+        <h3>개편 — 5개 + 상단 고정 예약</h3>
+        <ul>
+          <li><span class="grp">예약하기</span><div class="sub">파3 · 타석 · 아카데미 신청 (상단 항상 고정)</div></li>
+          <li><span class="grp">시설</span><div class="sub">골프(파3·레인지·어프로치·분석) · 수영장 · 피트니스</div></li>
+          <li><span class="grp">아카데미</span><div class="sub">일반 · 선수 · CEO · 뉴리더스 + 강욱순 콘텐츠</div></li>
+          <li><span class="grp">멤버십</span><div class="sub">회원 라운지 · GOLF BIBLE · 혜택 (로그인)</div></li>
+          <li><span class="grp">소식 · 안내</span><div class="sub">공지 · 이벤트 · 이용안내 · 오시는길 · FAQ</div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 KEY EXPERIENCE -->
+<section class="alt">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">05</span>
+      <div class="titles">
+        <p class="kicker">핵심 경험</p>
+        <h2>전환을 만드는 네 가지 기능</h2>
+      </div>
+    </div>
+    <div class="cards reveal">
+      <div class="card"><span class="tag">예약</span><h3>실시간 통합 예약</h3><p>파3·타석의 잔여 현황을 달력에서 한눈에. 시간대별 요금(피크/비피크)과 결제까지 한 흐름으로 묶습니다.</p></div>
+      <div class="card"><span class="tag">멤버</span><h3>회원 라운지</h3><p>로그인하면 열리는 전용 공간. GOLF BIBLE 강의를 무단복제 방지 스트리밍으로 안전하게 제공합니다.</p></div>
+      <div class="card"><span class="tag">콘텐츠</span><h3>강욱순 허브</h3><p>유튜브·스윙 메커니즘 강의를 시설 브랜드 안으로 모아, 신뢰와 가입 동기를 동시에 만듭니다.</p></div>
+      <div class="card"><span class="tag">모바일</span><h3>엄지 동선</h3><p>가장 많이 쓰는 예약·전화·길찾기를 하단 고정 바로. 현장 방문 직전 휴대폰 사용 맥락에 맞춥니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 ARCHITECTURE -->
+<section class="dark">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">06</span>
+      <div class="titles">
+        <p class="kicker">기술 아키텍처</p>
+        <h2>오래 쓰는 구조로 짓습니다</h2>
+      </div>
+    </div>
+    <p class="lead-p reveal" style="margin-bottom:34px">화려함은 프런트에, 안정성은 백엔드에. 직원이 직접 콘텐츠를 운영하고, 예약·결제·멤버십이 분리되어 각자 발전할 수 있는 구성입니다.</p>
+    <div class="arch reveal">
+      <div class="layer"><div class="lname">프런트엔드<small>Frontend</small></div><div class="chips"><span class="chip"><b>Next.js</b> (App Router)</span><span class="chip">React · TypeScript</span><span class="chip">Tailwind CSS</span><span class="chip">서버 렌더링 → SEO·속도</span></div></div>
+      <div class="layer"><div class="lname">콘텐츠 관리<small>Headless CMS</small></div><div class="chips"><span class="chip"><b>Sanity</b> / Strapi</span><span class="chip">공지 · 이벤트 · 시설 소개</span><span class="chip">직원 직접 편집</span></div></div>
+      <div class="layer"><div class="lname">예약 · 결제<small>Booking &amp; Pay</small></div><div class="chips"><span class="chip">자체 예약 DB <b>또는</b> 전문 SaaS</span><span class="chip"><b>포트원</b> · 토스페이먼츠</span><span class="chip">실시간 잔여 현황</span></div></div>
+      <div class="layer"><div class="lname">회원 · 인증<small>Auth</small></div><div class="chips"><span class="chip"><b>카카오</b> · 네이버 소셜 로그인</span><span class="chip">멤버십 등급</span><span class="chip">전용 콘텐츠 접근 제어</span></div></div>
+      <div class="layer"><div class="lname">미디어<small>Media</small></div><div class="chips"><span class="chip"><b>Mux</b> / Vimeo</span><span class="chip">회원 전용 보호 스트리밍</span><span class="chip">이미지 자동 최적화</span></div></div>
+      <div class="layer"><div class="lname">인프라 · 분석<small>Infra</small></div><div class="chips"><span class="chip"><b>Vercel</b> / AWS</span><span class="chip">GA4 · 히트맵</span><span class="chip">자동 백업 · HTTPS</span></div></div>
+    </div>
+    <p style="color:rgba(237,241,234,.6);font-size:var(--step--1);margin-top:22px" class="reveal narrow">
+      예약 엔진은 <b style="color:var(--brass-soft)">자체 개발</b>(맞춤성 높음)과 <b style="color:var(--brass-soft)">전문 SaaS 연동</b>(빠르고 안정적) 중
+      선배님과 운영 규모·예산을 보고 결정할 핵심 분기점입니다.
+    </p>
+  </div>
+</section>
+
+<!-- 07 ROADMAP -->
+<section>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="idx">07</span>
+      <div class="titles">
+        <p class="kicker">실행 로드맵</p>
+        <h2>단계별로, 위험은 낮게</h2>
+      </div>
+    </div>
+    <div class="timeline reveal">
+      <div class="phase ph0">
+        <div class="pmeta"><span class="pn2">P0</span><h3>디스커버리 · 정의</h3><span class="dur">약 1~2주</span></div>
+        <p>현장 인터뷰, 시설 사진·영상 점검, 예약 운영 방식 확인, 콘텐츠 자산 정리. 자체개발 vs SaaS 결정.</p>
+        <div class="deliver"><span>요구사항 정의서</span><span>사이트맵 확정</span><span>예약 방식 결정</span></div>
+      </div>
+      <div class="phase">
+        <div class="pmeta"><span class="pn2">P1</span><h3>디자인 시스템 · 핵심 화면</h3><span class="dur">약 3~4주</span></div>
+        <p>컬러·타이포·컴포넌트 토큰화. 메인·시설·예약 진입 화면 디자인 및 시안 합의.</p>
+        <div class="deliver"><span>디자인 시스템</span><span>메인/시설 시안</span><span>모바일 시안</span></div>
+      </div>
+      <div class="phase">
+        <div class="pmeta"><span class="pn2">P2</span><h3>예약 · 멤버십 구축</h3><span class="dur">약 4~6주</span></div>
+        <p>실시간 예약·결제, 소셜 로그인, 회원 라운지·보호 영상 스트리밍 개발.</p>
+        <div class="deliver"><span>예약 엔진</span><span>결제 연동</span><span>회원 라운지</span></div>
+      </div>
+      <div class="phase">
+        <div class="pmeta"><span class="pn2">P3</span><h3>콘텐츠 이관 · 런칭</h3><span class="dur">약 2~3주</span></div>
+        <p>CMS 콘텐츠 입력, 전수 QA, 성능·SEO 점검 후 정식 오픈. 직원 운영 교육.</p>
+        <div class="deliver"><span>콘텐츠 이관</span><span>QA·성능</span><span>정식 런칭</span></div>
+      </div>
+      <div class="phase">
+        <div class="pmeta"><span class="pn2">P4</span><h3>운영 · 고도화</h3><span class="dur">상시</span></div>
+        <p>데이터 기반 개선, 시즌 이벤트, 3D 코스 투어 등 차기 기능 검토.</p>
+        <div class="deliver"><span>분석 리포트</span><span>지속 개선</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 NEXT -->
+<section class="dark">
+  <div class="wrap narrow">
+    <div class="sec-head reveal">
+      <span class="idx">08</span>
+      <div class="titles">
+        <p class="kicker">다음 단계</p>
+        <h2>선배님과 함께 정할 것</h2>
+      </div>
+    </div>
+    <div class="next-grid reveal">
+      <div class="qcard"><div class="q">범위</div><p>전면 개편인지, 메인+예약부터 단계 오픈인지.</p></div>
+      <div class="qcard"><div class="q">예약 엔진</div><p>자체 개발 vs 전문 SaaS 연동 — 운영 규모와 예산 기준.</p></div>
+      <div class="qcard"><div class="q">콘텐츠</div><p>시설 사진·영상 신규 촬영 여부와 GOLF BIBLE 영상 권한.</p></div>
+      <div class="qcard"><div class="q">일정 · 예산</div><p>목표 오픈 시점과 단계별 투입 범위.</p></div>
+    </div>
+    <p class="lead-p reveal" style="margin-top:36px">
+      이 문서는 검토용 초안입니다. 위 네 가지를 선배님과 정해 주시면,
+      거기에 맞춰 화면 시안과 상세 견적·일정으로 구체화하겠습니다.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>KWS&nbsp;<b>SPORTS</b> · 강욱순스포츠 웹사이트 리뉴얼 제안서</span>
+    <span>검토용 초안 · 2026.06.28</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      els.forEach(function (e) { e.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>
